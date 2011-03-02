@@ -23,6 +23,9 @@ alias gitc="git commit -a"
 alias gitm="git commit "
 alias giti="git init"
 
+# power
+alias shut="shutdown -h now"
+
 
 # Paste to sprunge.us
 sprunge () 
@@ -62,6 +65,13 @@ extract() {
 mktar() { tar cvf "${1%%/}.tar" "${1%%/}/"; }
 mktgz() { tar cvzf "${1%%/}.tar.gz" "${1%%/}/"; }
 mktbz() { tar cvjf "${1%%/}.tar.bz2" "${1%%/}/"; }
+
+# Copy and Move then follow
+cpf() { cp "$@" && goto "$_"; }
+mvf() { mv "$@" && goto "$_"; }
+goto() { [ -d "$1" ] && cd "$1" || cd "$(dirname "$1")"; 
+
+
 
 
 stock ()
