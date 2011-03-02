@@ -69,7 +69,7 @@ mktbz() { tar cvjf "${1%%/}.tar.bz2" "${1%%/}/"; }
 # Copy and Move then follow
 cpf() { cp "$@" && goto "$_"; }
 mvf() { mv "$@" && goto "$_"; }
-goto() { [ -d "$1" ] && cd "$1" || cd "$(dirname "$1")"; 
+goto() { [ -d "$1" ] && cd "$1" || cd "$(dirname "$1")" 
 
 
 
