@@ -1,0 +1,2 @@
+#!/bin/bash
+lynx -dump 'http://whatismyip.com/automation/n09230945.asp' | awk '{ print $1 }'

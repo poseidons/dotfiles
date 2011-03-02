@@ -1,0 +1,32 @@
+#!/bin/sh
+
+CC="gcc -std=c99 -pipe -Wall -pedantic"
+CFLAGS="-O2"
+SRC=/tmp/tmp$$.c
+OUT=/tmp/tmp$$
+
+trap_exit() {
+  [ -f "$OUT" ] && rm -f "$OUT"
+  [ -f "$SRC" ] && rm -f "$SRC"
+}
+
+trap 'trap_exit' 0 TERM HUP QUIT INT
+
+cat > "$SRC" << EOF
+#define _GNU_SOURCE
+#include <errno.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  $@
+  return 0;
+}
+EOF
+
+$CC $CFLAGS $SRC -o "$OUT" && "$OUT"

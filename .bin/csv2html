@@ -1,0 +1,53 @@
+#!/bin/bash
+
+NUMFIELDS=0
+OUT=()
+TLC=0
+
+to_html() {
+  local lc=0 # line counter in case of error
+
+  while IFS=',' read -r -a items; do
+    (( ++lc ))
+    OUT+=("\t<tr>\n") # start row
+
+    # skip blank lines, but not lines with empty fields
+    (( ${#items[@]} == 0 )) && continue
+
+    # assert: all rows are same number of columns
+    (( NUMFIELDS == 0 )) && NUMFIELDS=${#items[@]}
+    if (( NUMFIELDS != ${#items[@]} )); then
+      echo "error: Malformed CSV ($file: line $LC). Expected $NUMFIELDS fields, found ${#items[@]}." >&2
+      exit 1
+    fi
+
+    # output each column, stripping NULL tokens
+    for item in "${items[@]}"; do
+      OUT+=("\t\t<td>${item/==NULL==/}</td>\n")
+    done
+
+    OUT+=("\t</tr>\n") # end row
+
+    (( TLC += lc ))
+
+  # replace blank fields with a dummy value so read doesn't skip them
+  done < <(sed 's/^,/==NULL==,/;
+                s/,,/,==NULL==,/g;
+                s/,$/,==NULL==/' <&6)
+}
+
+OUT+=("<table>\n") # header
+
+# use a new FD to unify where to read from
+if (( $# == 0 )); then
+  exec 6<&0
+  to_html
+else
+  for file; do
+    exec 6< "$file"
+    to_html
+    exec 6<&-
+  done
+fi
+
+(( TLC > 0 )) && OUT+=("</table>\n") # footer
